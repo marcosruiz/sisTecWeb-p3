@@ -1,0 +1,37 @@
+{
+  "name": "sistecwebp3",
+  "version": "1.0.0",
+  "description": "practica 3 de sistemas y tecnologias web universidad de zaragoza",
+  "main": "index.js",
+  "dependencies": {
+    "formidable": "^1.0.17",
+    "fs": "^0.0.2",
+    "mongodb": "^2.2.5",
+    "mongoose": "^4.5.9",
+    "querystring": "^0.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcosruiz/sisTecWeb-p3.git"
+  },
+  "keywords": [
+    "sistemas",
+    "tecnologias",
+    "web",
+    "practica",
+    "3",
+    "universidad",
+    "zaragoza"
+  ],
+  "author": "marcos ruiz garcia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marcosruiz/sisTecWeb-p3/issues"
+  },
+  "homepage": "https://github.com/marcosruiz/sisTecWeb-p3#readme"
+}
