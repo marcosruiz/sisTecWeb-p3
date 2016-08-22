@@ -1,8 +1,10 @@
 var querystring = require("querystring"),
 fs = require("fs"),
-formidable = require("formidable");
+formidable = require("formidable"),
+mongodb = require("mongodb"),
+mongoose = require("mongoose");
 
-function start(response, postData) {
+function start(response) {
 	console.log("Request handler 'start' was called.");
 
 	var body = '<html>'+
@@ -51,6 +53,67 @@ function show(response) {
 	fs.createReadStream("./tmp/test.png").pipe(response);
 }
 
+function setmemo(response){
+	console.log("Request handler 'setmemo' was called.");
+	var body = '<html>'+
+		'<head>'+
+		'<meta http-equiv="Content-Type" '+
+		'content="text/html; charset=UTF-8" />'+
+		'</head>'+
+		'<body>'+
+		'<form action="/savetask" enctype="multipart/form-data" '+
+		'method="post">'+
+		'<input type="date" name="date"/><br/>' +
+		'<input type="text" name="text"/><br/>' +
+		'<input type="file" name="file" multiple="multiple"/><br/>'+
+		'<input type="submit" value="Save task" />'+
+		'</form>'+
+		'</body>'+
+		'</html>';
+
+	response.writeHead(200, {"Content-Type": "text/html"});
+	response.write(body);
+	response.end();
+}
+
+var fields = {};
+var files = {};
+
+function savetask(response, request){
+	console.log("Request handler 'savetask' was called.");
+
+	var form = new formidable.IncomingForm();
+
+	form
+		.on('field', function(field, value){
+			console.log(field, value);
+      fields[field] = value;
+		})
+		.on('file', function(field, file) {
+        //console.log(field, file);
+        files[field] = file;
+    })
+    .on('end', function() {
+			mongoose.connect('mongodb://localhost/test');
+			var db = mongoose.connection;
+			db.on('error', console.error.bind(console, 'connection error:'));
+			db.once('open', function() {
+			  // we're connected!
+				console.log("we are connected");
+			});
+
+      response.writeHead(200, {'content-type': 'text/plain'});
+      response.write(fields["date"]);
+      response.write('\n\n');
+			response.write(fields["text"]);
+			response.write('\n\n');
+			response.end();
+    });
+		form.parse(request);
+}
+
 exports.start = start;
 exports.upload = upload;
 exports.show = show;
+exports.setmemo = setmemo;
+exports.savetask = savetask;
