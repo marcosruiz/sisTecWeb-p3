@@ -1,9 +1,7 @@
 var querystring = require("querystring"),
 fs = require("fs"),
 formidable = require("formidable"),
-mongodb = require("mongodb"),
-mongoose = require("mongoose");
-var Note = require('./mongo');
+moduleIndex = require("./index");
 
 function start(response) {
 	console.log("Request handler 'start' was called.");
@@ -77,30 +75,25 @@ function setmemo(response){
 	response.end();
 }
 
-var fields = {};
-var files = {};
 
-function showallmemo(response){
-
-	Note.find({}, function(err, notes){
-		if(!err){
-			response.writeHead(200, {'content-type': 'text/html'});
-			response.write('<!DOCTYPE html><html><body>');
-			response.write('<table>');
-			response.write('<tr><th>Date</th><th>Text</th><th>More</th></tr>');
-			notes.forEach(function(note){
-				response.write('<tr>');
-				response.write('<th>' + note.date + '</th>');
-				response.write('<th>' + note.text + '</th>');
-				response.write('<th>' + '-' + '</th>');
-				response.write('</tr>');
-			});
-			response.write('</table>');
-			response.write('</body></html>');
-			response.end();
-		}else{throw err;}
+function showallmemo(response, request){
+	moduleIndex.con.query('SELECT * FROM notes', function(err, rows){
+		if(err) throw err;
+		response.writeHead(200, {'content-type': 'text/html'});
+		response.write('<!DOCTYPE html><html><body>');
+		response.write('<table>');
+		response.write('<tr><th>Date</th><th>Text</th><th>More</th></tr>');
+		for (var i = 0; i < rows.length; i++) {
+			response.write('<tr>');
+			response.write('<th>' + rows[i].date + '</th>');
+			response.write('<th>' + rows[i].text + '</th>');
+			response.write('<th>' + rows[i].route_file + '</th>');
+			response.write('</tr>');
+		};
+		response.write('</table>');
+		response.write('</body></html>');
+		response.end();
 	});
-
 }
 
 function savetask(response, request){
@@ -118,38 +111,9 @@ function savetask(response, request){
         files[field] = file;
     })
     .on('end', function() {
-			//Check if we are connected
-			var db = mongoose.connection;
-			db.on('error', console.error.bind(console, 'connection error:'));
-			db.once('open', function() {
-			  // we're connected!
-				console.log("we are connected");
-			});
-			///////////////////////////
-
-			var Note = mongoose.model('Note', {date: String, text: String});
-			var note1 = new Note({date: fields["date"], text: fields["text"]});
-			console.log(note1);
-			//Lets save it
-			note1.save(function (err, noteObj) {
-			  if (err) {
-			    console.log(err);
-
-					response.writeHead(500, {'content-type': 'text/plain'});
-		      response.write("error 500");
-			  } else {
-			    console.log('saved successfully:', noteObj);
-
-					response.writeHead(200, {'content-type': 'text/plain'});
-		      response.write(fields["date"]);
-		      response.write('\n\n');
-					response.write(fields["text"]);
-					response.write('\n\n');
-					response.end();
-			  }
-			});
-
-
+			response.writeHead(200, {'content-type': 'text/plain'});
+			response.write('hah');
+			response.end();
     });
 		form.parse(request);
 }
