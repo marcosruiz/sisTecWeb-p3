@@ -122,19 +122,21 @@ function savetask(response, request){
 		form.parse(request, function(error, fields, files) {
 			//If there are a file it will save it
 			var route = "";
-			if(files.file.name != ''){
-				route = "./tmp/" + files.file.name;
-				/* Possible error on Windows systems:
-				tried to rename to an already existing file */
-				fs.rename(files.file.path, route, function(error) {
-					if (error) {
-						fs.unlink(route);
-						fs.rename(files.file.path, route);
-					}
-				});
+			if(typeof files.file !== 'undefined'){
+				if(files.file.name != ''){
+					route = "./tmp/" + files.file.name;
+					/* Possible error on Windows systems:
+					tried to rename to an already existing file */
+					fs.rename(files.file.path, route, function(error) {
+						if (error) {
+							fs.unlink(route);
+							fs.rename(files.file.path, route);
+						}
+					});
+				}
 			}
+
 			//Check data and insert into our database
-			console.log(fields['date']);
 			if(fields['date'] == '' | fields['text'] == '' ){
 				response.writeHead(200, {'content-type': 'text/html'});
 				response.write('<!DOCTYPE html><html><body>');
@@ -206,17 +208,23 @@ function deleted(response, request){
 			}
 		})
     .on('end', function() {
-			moduleIndex.con.query('DELETE FROM notes WHERE id= ' + id, function(err, rows){
-				response.writeHead(200, {'content-type': 'text/html'});
-				response.write('<!DOCTYPE html><html><body>');
-				if(err){
-					response.write('There was a problem deleting note ' + id + '.');
-				} else {
-					response.write('Note ' + id + ' was deleted.');
-				}
-				response.write('</body></html>');
+			if(typeof id !== 'undefined'){
+				moduleIndex.con.query('DELETE FROM notes WHERE id= ' + id, function(err, rows){
+					response.writeHead(200, {'content-type': 'text/html'});
+					response.write('<!DOCTYPE html><html><body>');
+					if(err){
+						response.write('There was a problem deleting note ' + id + '.');
+					} else {
+						response.write('Note ' + id + ' was deleted.');
+					}
+					response.write('</body></html>');
+					response.end();
+				});
+			} else{
+				response.writeHead(200, {'content-type': 'text/plain'});
+				response.write('There was a problem with our database connection.');
 				response.end();
-			});
+			}
     });
 		form.parse(request);
 
