@@ -2,6 +2,7 @@ var server = require("./server");
 var router = require("./router");
 var requestHandlers = require("./requestHandlers");
 var mysql = require("mysql");
+var nodeglob = require("node-glob");
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -26,6 +27,7 @@ handle["/show"] = requestHandlers.show;
 handle["/setmemo"] = requestHandlers.setmemo;
 handle["/savetask"] = requestHandlers.savetask;
 handle["/showallmemo"] = requestHandlers.showallmemo;
+handle["/showmemo"] = requestHandlers.showmemo;
 
 server.start(router.route, handle);
 

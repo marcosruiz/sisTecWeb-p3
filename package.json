@@ -9,8 +9,10 @@
     "mongodb": "^2.2.5",
     "mongoose": "^4.5.9",
     "mysql": "^2.11.1",
+    "node-glob": "^1.2.0",
     "node-mysql": "^0.4.2",
-    "querystring": "^0.2.0"
+    "querystring": "^0.2.0",
+    "url": "^0.11.0"
   },
   "devDependencies": {},
   "scripts": {

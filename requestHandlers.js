@@ -1,7 +1,8 @@
 var querystring = require("querystring"),
 fs = require("fs"),
 formidable = require("formidable"),
-moduleIndex = require("./index");
+moduleIndex = require("./index"),
+url = require('url');
 
 function start(response) {
 	console.log("Request handler 'start' was called.");
@@ -76,7 +77,7 @@ function setmemo(response){
 }
 
 
-function showallmemo(response, request){
+function showallmemo(response){
 	moduleIndex.con.query('SELECT * FROM notes', function(err, rows){
 		if(err) throw err;
 		response.writeHead(200, {'content-type': 'text/html'});
@@ -90,6 +91,28 @@ function showallmemo(response, request){
 			response.write('<th>' + rows[i].route_file + '</th>');
 			response.write('</tr>');
 		};
+		response.write('</table>');
+		response.write('</body></html>');
+		response.end();
+	});
+}
+
+function showmemo(response, request){
+	var url_parts = url.parse(request.url, true);
+	var id = url_parts.query[""];
+	moduleIndex.con.query('SELECT * FROM notes WHERE id = ' + id, function(err, rows){
+		if(err) throw err;
+		response.writeHead(200, {'content-type': 'text/html'});
+		response.write('<!DOCTYPE html><html><body>');
+		response.write('<table>');
+		response.write('<tr><th>Date</th><th>Text</th><th>More</th></tr>');
+
+		response.write('<tr>');
+		response.write('<th>' + rows[0].date + '</th>');
+		response.write('<th>' + rows[0].text + '</th>');
+		response.write('<th>' + rows[0].route_file + '</th>');
+		response.write('</tr>');
+
 		response.write('</table>');
 		response.write('</body></html>');
 		response.end();
@@ -118,11 +141,10 @@ function savetask(response, request){
 		form.parse(request);
 }
 
-
-
 exports.start = start;
 exports.upload = upload;
 exports.show = show;
 exports.setmemo = setmemo;
 exports.savetask = savetask;
 exports.showallmemo = showallmemo;
+exports.showmemo = showmemo;
