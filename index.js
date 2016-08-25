@@ -20,14 +20,14 @@ con.connect(function(err){
 });
 
 var handle = {};
-handle["/"] = requestHandlers.start;
-handle["/start"] = requestHandlers.start;
-handle["/upload"] = requestHandlers.upload;
-handle["/show"] = requestHandlers.show;
+handle["/"] = requestHandlers.setmemo;
 handle["/setmemo"] = requestHandlers.setmemo;
 handle["/savetask"] = requestHandlers.savetask;
 handle["/showallmemo"] = requestHandlers.showallmemo;
 handle["/showmemo"] = requestHandlers.showmemo;
+handle["/deletememo"] = requestHandlers.deletememo;
+handle["/deleted"] = requestHandlers.deleted;
+handle["/downloadfile"] = requestHandlers.downloadfile;
 
 server.start(router.route, handle);
 
