@@ -1,7 +1,7 @@
 var querystring = require("querystring"),
 fs = require("fs"),
 formidable = require("formidable"),
-moduleIndex = require("./index"),
+notesDAO = require("./notesDAO"),
 url = require('url');
 
 /*
@@ -10,6 +10,7 @@ file and a submit button witch calls to /savetask
 */
 function setmemo(response){
 	console.log("Request handler 'setmemo' was called.");
+
 	var body = '<html>'+
 		'<head>'+
 		'<meta http-equiv="Content-Type" '+
@@ -35,7 +36,7 @@ function setmemo(response){
 Show a list of all notes of our database
 */
 function showallmemo(response){
-	moduleIndex.con.query('SELECT * FROM notes', function(err, rows){
+	notesDAO.listNotes(function(err, rows){
 		if(err) throw err;
 		response.writeHead(200, {'content-type': 'text/html'});
 		response.write('<!DOCTYPE html><html><body>');
@@ -62,7 +63,7 @@ Show all info about a specific notes
 function showmemo(response, request){
 	var url_parts = url.parse(request.url, true);
 	var id = url_parts.query[""];
-	moduleIndex.con.query('SELECT * FROM notes WHERE id = ' + id, function(err, rows){
+	notesDAO.findNote(id, function(err, rows){
 		if(err) throw err;
 		response.writeHead(200, {'content-type': 'text/html'});
 		response.write('<!DOCTYPE html><html><body>');
@@ -92,7 +93,7 @@ function downloadfile(response, request){
 	var url_parts = url.parse(request.url, true);
 	var id = url_parts.query[""];
 	if(typeof id !== 'undefined'){
-		moduleIndex.con.query('SELECT * FROM notes WHERE id= ' + id, function(err, rows){
+		notesDAO.findNote(id, function(err, rows){
 			if(err) throw err;
 			if(rows.length !== 0){
 				response.writeHead(200, {});
@@ -145,7 +146,7 @@ function savetask(response, request){
 				response.end();
 			}else{
 				var note = { date: fields['date'], text: fields['text'], route_file: route };
-				moduleIndex.con.query('INSERT INTO notes SET ?', note, function(err, rows){
+				notesDAO.insertNote(note, function(err, rows){
 					response.writeHead(200, {'content-type': 'text/html'});
 					response.write('<!DOCTYPE html><html><body>');
 					if(err){
@@ -172,7 +173,7 @@ function deletememo(response){
 		'<input type="submit"></input>'+
 		'</form>';
 
-	moduleIndex.con.query('SELECT * FROM notes', function(err, rows){
+	notesDAO.listNotes(function(err, rows){
 		if(err) throw err;
 		response.writeHead(200, {'content-type': 'text/html'});
 		response.write('<!DOCTYPE html><head><title>deletememo</title></head><html><body>');
@@ -209,7 +210,7 @@ function deleted(response, request){
 		})
     .on('end', function() {
 			if(typeof id !== 'undefined'){
-				moduleIndex.con.query('DELETE FROM notes WHERE id= ' + id, function(err, rows){
+				notesDAO.deleteNote(id, function(err, rows){
 					response.writeHead(200, {'content-type': 'text/html'});
 					response.write('<!DOCTYPE html><html><body>');
 					if(err){
