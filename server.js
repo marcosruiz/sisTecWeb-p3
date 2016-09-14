@@ -1,6 +1,9 @@
 var http = require("http");
 var url = require("url");
 
+/*
+It starts our web server on port 8888
+*/
 function start(route, handle){
 	function onRequest(request, response){
 
